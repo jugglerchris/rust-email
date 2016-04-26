@@ -38,6 +38,7 @@ impl Rfc5322Character for char {
     fn is_vchar(&self) -> bool {
         match *self {
             '!'...'~' => true,
+            '\u{80}'...'\u{10FFFF}' => true,
             _ => false,
         }
     }
