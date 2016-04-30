@@ -334,7 +334,8 @@ impl MimeMessage {
                         ParseState::Normal
                     }
                 },
-                (ParseState::ReadBoundary, '\r') => {
+                (ParseState::ReadBoundary, '\r') |
+                (ParseState::ReadBoundary, '\n') => {
                     let read_boundary = body_slice[(boundary_start + 1)..pos].trim();
                     if &read_boundary.to_string() == boundary {
                         // Boundary matches, push the part
@@ -354,7 +355,9 @@ impl MimeMessage {
                     ParseState::ReadBoundary
                 },
                 (ParseState::SeenLf, '-') => ParseState::SeenDash,
+                (ParseState::SeenLf, '\n') => ParseState::SeenLf,
                 (ParseState::SeenCr, '\n') => ParseState::SeenLf,
+                (ParseState::Normal, '\n') => ParseState::SeenLf,
                 (ParseState::Normal, '\r') => ParseState::SeenCr,
                 (ParseState::Normal, _) => ParseState::Normal,
                 (_, _) => ParseState::Normal,
