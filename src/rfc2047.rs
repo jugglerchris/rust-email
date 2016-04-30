@@ -49,6 +49,15 @@ pub fn decode_q_encoding(s: &str) -> Result<Vec<u8>, String> {
                 let mut hex_string = String::new();
                 for _ in 0..2 {
                     let hex_digit_char = char_iter.next().unwrap();  // FIXME
+
+                    /* Special case; if we see "=\n", insert the implicit \r; this
+                     * is required for messages on Unix. */
+                    if hex_digit_char == '\n' && hex_string.len() == 0 {
+                        // Handle LF-only
+                        hex_string.push('\r');
+                        hex_string.push('\n');
+                        break;
+                    }
                     hex_string.push(hex_digit_char);
                 };
 
